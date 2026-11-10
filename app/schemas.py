@@ -30,11 +30,11 @@ class InferenceResponse(BaseModel):
 class Event(BaseModel):
     event_id: int
     device_id: int
-    animal: str
-    behaviour: str
-    confidence: float
+    animal: str | None = None
+    behaviour: str | None = None
+    confidence: float | None = None
     risk_level: str
-    deterrence_action: str
+    deterrence_action: str | None = None
     frame_path: str | None = None
     created_at: str | None = None
 
@@ -68,6 +68,7 @@ class Device(BaseModel):
     device_name: str
     location: str
     status: str
+    farm_id: int | None = None
     created_at: str | None = None
 
 

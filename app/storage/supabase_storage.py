@@ -4,6 +4,19 @@ from supabase import Client, create_client
 from app.storage.base import Row
 
 
+def _event(row: Row) -> Row:
+    """The capstone schema stores the event time in `timestamp`."""
+    if row and "created_at" not in row:
+        row = {**row, "created_at": row.get("timestamp")}
+    return row
+
+
+def _feedback(row: Row) -> Row:
+    if row and "created_at" not in row:
+        row = {**row, "created_at": row.get("submitted_at")}
+    return row
+
+
 class SupabaseStorage:
     def __init__(self, url: str, key: str) -> None:
         if not url or not key:
@@ -18,14 +31,15 @@ class SupabaseStorage:
 
     # events
     def insert_event(self, data: Row) -> Row:
-        return self._insert("events", data)
+        return _event(self._insert("events", data))
 
     def list_events(self, limit: int = 100) -> list[Row]:
-        return self.client.table("events").select("*").order("event_id", desc=True).limit(limit).execute().data
+        rows = self.client.table("events").select("*").order("event_id", desc=True).limit(limit).execute().data
+        return [_event(r) for r in rows]
 
     def get_event(self, event_id: int) -> Row | None:
         res = self.client.table("events").select("*").eq("event_id", event_id).limit(1).execute()
-        return res.data[0] if res.data else None
+        return _event(res.data[0]) if res.data else None
 
     # alerts
     def insert_alert(self, data: Row) -> Row:
@@ -40,7 +54,7 @@ class SupabaseStorage:
 
     # devices
     def list_devices(self) -> list[Row]:
-        cols = "device_id, device_name, location, status, created_at"
+        cols = "device_id, device_name, location, status, created_at, farm_id"
         return self.client.table("devices").select(cols).order("device_id").execute().data
 
     def insert_device(self, data: Row) -> Row:
@@ -52,7 +66,7 @@ class SupabaseStorage:
 
     # feedback
     def insert_feedback(self, data: Row) -> Row:
-        return self._insert("feedback", data)
+        return _feedback(self._insert("feedback", data))
 
     # users
     def get_user_by_username(self, username: str) -> Row | None:
