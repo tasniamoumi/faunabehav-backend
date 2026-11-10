@@ -5,8 +5,13 @@ Edge cameras detect animals and classify their behaviour; this API decides how
 risky each event is, tells the device what to do about it (monitor, flash a
 light, sound a siren), raises alerts for operators and feeds a dashboard.
 
-Built as my final-year capstone project (BSc Computer Science (AI), Taylor's
-University), then hardened into a complete, tested service.
+Built as my final-year capstone project (BSc Computer Science (Hons), Taylor's
+University, supervised by Dr Mohsen Marjani), then hardened into a complete,
+tested service. FaunaBehav was a five-person team project; I was the
+**System & Backend Engineer**: system architecture, the FastAPI backend, the
+behaviour-to-risk mapping and deterrence decision logic, data flow between
+components, and backend testing. Teammates owned the models, the dataset and
+the React dashboard.
 
 [![CI](https://github.com/tasniamoumi/faunabehav-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/tasniamoumi/faunabehav-backend/actions/workflows/ci.yml)
 
@@ -31,6 +36,17 @@ with YOLO bounding boxes and species confidence, 73 alerts, and an operator
 review workflow (`outcome`, `farmer_notes`, `escalation`). The code in the
 original upload was an earlier snapshot; v1.0 is written against the real
 columns.
+
+**How the full system worked.** Operators uploaded wildlife video through the
+React dashboard; YOLOv8 identified the species, R3D-18 classified the behaviour
+from the clip, and the backend mapped the result to a risk level and a
+recommended deterrence action (the capstone recommended actions, it did not
+drive hardware). The design defined a five-level taxonomy (Neutral Movement →
+Field Approach → Crop Proximity → Crop Consumption → Aggressive/Destructive,
+mapped Low → Critical); the implementation shipped with the simpler behaviour
+classes listed at the end of this file. Known limitations from the project
+report: recorded video rather than live streams, a limited test-footage set,
+and no physical device control.
 
 ## Architecture
 
