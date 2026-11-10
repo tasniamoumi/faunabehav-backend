@@ -16,13 +16,21 @@ University), then hardened into a complete, tested service.
 |---|---|
 | FastAPI service: inference endpoint, events, alerts, devices, feedback, dashboard, auth | The detection and behaviour models (YOLOv8, R3D-18). Weights and training data from the capstone were not preserved. |
 | Risk engine and deterrence policy, unit-tested | The React dashboard that consumed this API |
-| Postgres schema (`schema.sql`) for Supabase | |
+| Postgres schema (`schema.sql`) matching the original capstone database, with RLS | |
 | Device API keys and JWT user auth with roles | |
 | In-memory mode for tests and demos, 25 tests, CI, Docker | |
 
 The API accepts **labelled detections** from devices that run the models
 themselves. The model boundary is a small interface (`app/domain/inference.py`),
 so a model-hosting adapter can be added without touching the routes.
+
+**About the data.** The capstone's Supabase database survived and is the
+source of truth for the schema. It shows the full system as it ran in
+June–August 2026: 14 registered cameras across farms, over a hundred events
+with YOLO bounding boxes and species confidence, 73 alerts, and an operator
+review workflow (`outcome`, `farmer_notes`, `escalation`). The code in the
+original upload was an earlier snapshot; v1.0 is written against the real
+columns.
 
 ## Architecture
 
@@ -59,8 +67,8 @@ python -m scripts.demo
 **Against Supabase:**
 
 ```bash
-cp .env.example .env        # fill in SUPABASE_URL, SUPABASE_KEY, JWT_SECRET
-# run schema.sql once in the Supabase SQL editor
+cp .env.example .env        # SUPABASE_URL, SUPABASE_KEY (service-role key, server-side only), JWT_SECRET
+# run schema.sql once in the Supabase SQL editor (creates tables, or upgrades the capstone ones, and enables RLS)
 python -m scripts.bootstrap admin  tasnia <password>        # first admin user
 python -m scripts.bootstrap device cam-north "North paddock" # prints the device key once
 uvicorn app.main:app --reload
@@ -122,6 +130,7 @@ schema.sql         Postgres tables, constraints and indexes
 - **Confidence gate.** High-risk behaviours at low confidence no longer trigger the siren.
 - **One storage layer** instead of a Supabase client created in four files,
   and the alerts list makes two bulk reads instead of two queries per alert.
+- **Row Level Security** on every table; only the API's service-role key can reach the data.
 - Tests, CI, Docker, a schema file and a credential-free demo mode.
 
 ## Behaviour classes

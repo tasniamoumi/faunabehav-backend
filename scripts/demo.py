@@ -3,6 +3,7 @@
     python -m scripts.demo            # then open http://localhost:8000/docs
     login: admin / demo-password      device key is printed on start-up
 """
+import os
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -44,4 +45,4 @@ if __name__ == "__main__":
 
     app.router.lifespan_context = lifespan
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))

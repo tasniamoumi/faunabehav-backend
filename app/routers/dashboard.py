@@ -15,8 +15,8 @@ def summary(_: Row = Depends(require_user), storage: Storage = Depends(get_stora
     alerts = storage.list_alerts(limit=500)
     devices = storage.list_devices()
 
-    by_risk = Counter(str(e.get("risk_level", "Low")) for e in events)
-    animals = Counter(str(e.get("animal", "unknown")) for e in events)
+    by_risk = Counter(str(e.get("risk_level") or "Low").capitalize() for e in events)
+    animals = Counter(str(e.get("animal") or "unknown").replace(" ", "_").lower() for e in events)
     return DashboardSummary(
         total_events=len(events),
         high_risk_events=by_risk.get("High", 0),
