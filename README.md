@@ -15,6 +15,12 @@ the React dashboard.
 
 [![CI](https://github.com/tasniamoumi/faunabehav-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/tasniamoumi/faunabehav-backend/actions/workflows/ci.yml)
 
+**Live demo:** <https://faunabehav-api.onrender.com/docs> — log in with
+`admin` / `demo-password` (Authorize button). It runs in demo mode: in-memory
+storage with seeded sample data, no connection to the real database, and it
+resets on every restart. Free hosting sleeps when idle, so the first request
+can take up to a minute.
+
 ## What's here, and what isn't
 
 | Included | Not included |
